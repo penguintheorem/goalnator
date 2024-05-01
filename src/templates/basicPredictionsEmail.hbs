@@ -1,0 +1,28 @@
+<html>
+  <head>
+    <meta charset='utf-8' />
+    <title>{{title}}</title>
+  </head>
+  <body>
+    <h1>{{title}}</h1>
+    {{#each championshipPredictions}}
+      <h2>{{championshipName}}</h2>
+      <table border='1' cellpadding='5' cellspacing='0'>
+        <tr>
+          <th>Match Time</th>
+          <th>Home Team</th>
+          <th>Away Team</th>
+          <th>Result</th>
+        </tr>
+        {{#each predictions}}
+          <tr>
+            <td>{{metadata.matchTime}}</td>
+            <td>{{metadata.homeTeam}}</td>
+            <td>{{metadata.awayTeam}}</td>
+            <td>{{result}}</td>
+          </tr>
+        {{/each}}
+      </table>
+    {{/each}}
+  </body>
+</html>

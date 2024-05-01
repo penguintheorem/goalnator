@@ -1,32 +1,107 @@
-/**
- * Welcome to Cloudflare Workers! This is your first worker.
- *
- * - Run `npm run dev` in your terminal to start a development server
- * - Open a browser tab at http://localhost:8787/ to see your worker in action
- * - Run `npm run deploy` to publish your worker
- *
- * Learn more at https://developers.cloudflare.com/workers/
- */
+import { EmailSender } from '@lib/EmailSender'
+import { SimpleEmailServiceClient } from '@lib/SimpleEmailServiceClient'
+import { WebScraper } from '@lib/WebScraper'
+import { WebScraperPuppeteer } from '@lib/WebScraperPuppeteer'
+import { WebScrapingConfig } from '@lib/types/WebScrapingConfig'
+import { FootballPredictionEngine } from '@model/FootballPredictionEngine'
+import { ShortFrequencyPredictor } from '@model/ShortFrequencyPredictor'
+import {
+  APIGatewayEvent,
+  APIGatewayProxyResult,
+  Context,
+  EventBridgeEvent,
+} from 'aws-lambda'
+import configs from './config/web-scraping-config.json'
+import { ChampionshipPredictions, ChampionshipStats } from '@model/types'
+import { FootballPredictionsEmailTemplateBuilder } from '@lib/FootballPredictionsEmailTemplateBuilder'
+import dotenv from 'dotenv'
 
-export interface Env {
-	// Example binding to KV. Learn more at https://developers.cloudflare.com/workers/runtime-apis/kv/
-	// MY_KV_NAMESPACE: KVNamespace;
-	//
-	// Example binding to Durable Object. Learn more at https://developers.cloudflare.com/workers/runtime-apis/durable-objects/
-	// MY_DURABLE_OBJECT: DurableObjectNamespace;
-	//
-	// Example binding to R2. Learn more at https://developers.cloudflare.com/workers/runtime-apis/r2/
-	// MY_BUCKET: R2Bucket;
-	//
-	// Example binding to a Service. Learn more at https://developers.cloudflare.com/workers/runtime-apis/service-bindings/
-	// MY_SERVICE: Fetcher;
-	//
-	// Example binding to a Queue. Learn more at https://developers.cloudflare.com/queues/javascript-apis/
-	// MY_QUEUE: Queue;
+dotenv.config()
+
+console.log(`configs: ${JSON.stringify(process.env, null, 2)}`)
+
+const getStats = async (
+  config: WebScrapingConfig[],
+): Promise<ChampionshipStats[]> => {
+  const webScraper: WebScraper = new WebScraperPuppeteer()
+  const stats: ChampionshipStats[] = []
+
+  for (const championshipConfig of config) {
+    // TODO: replace with a good logger
+    const { championshipName } = championshipConfig
+    console.log(`START Getting stats for championship ${championshipName}`)
+    const ranking = await webScraper.getRanking(championshipConfig.rankingUrl)
+    const matchDay = await webScraper.getMatchDay(
+      championshipConfig.nextMatchDayUrl,
+    )
+
+    stats.push({ championshipName, ranking, matchDay })
+    console.log(`FINISH Getting stats for championship ${championshipName}`)
+  }
+
+  return stats
 }
 
-export default {
-	async scheduled(event, env, ctx) {
-	  console.log("cron processed");
-	},
-  } satisfies ExportedHandler;
+const getPredictions = (
+  stats: ChampionshipStats[],
+): ChampionshipPredictions[] => {
+  const predictions: ChampionshipPredictions[] = []
+
+  for (const { championshipName, ranking, matchDay } of stats) {
+    const footballPredictionEngine: FootballPredictionEngine =
+      new ShortFrequencyPredictor()
+
+    const matchPredictions = footballPredictionEngine.getMatchDayPrediction(
+      matchDay,
+      ranking,
+    )
+
+    predictions.push({ championshipName, predictions: matchPredictions })
+  }
+
+  return predictions
+}
+
+const sendEmail = (
+  predictions: ChampionshipPredictions[],
+): Promise<boolean> => {
+  const emailSender: EmailSender<string> = new SimpleEmailServiceClient(
+    process.env.AWS_REGION,
+    process.env.SENDER_EMAIL,
+  )
+  const emailContent = new FootballPredictionsEmailTemplateBuilder().build(
+    predictions,
+  )
+
+  const targetEmails = JSON.parse(process.env.TARGET_EMAILS_JSON)
+  return emailSender.sendEmail(targetEmails, emailContent, 'Weekly Predictions')
+}
+
+// TODO: configure a custom logger here
+export const handler = async (
+  event: EventBridgeEvent<string, any> | APIGatewayEvent,
+  context: Context,
+): Promise<APIGatewayProxyResult> => {
+  // FEATURE: add validation
+  // we may accept only the championship predictions that we are expecting
+  const webScrapingConfigs: WebScrapingConfig[] = configs
+  const stats = await getStats(webScrapingConfigs)
+  const predictions = getPredictions(stats)
+  const emailSendingResult = await sendEmail(predictions)
+
+  if (!emailSendingResult) {
+    return {
+      statusCode: 500,
+      body: JSON.stringify({
+        message: 'Error sending email',
+      }),
+    }
+  }
+
+  return {
+    statusCode: 200,
+    body: JSON.stringify({
+      message: 'ok',
+    }),
+  }
+}

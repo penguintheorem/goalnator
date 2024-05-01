@@ -1,0 +1,37 @@
+[
+  {
+    "countryCode": "IT",
+    "championshipName": "Serie A",
+    "rankingUrl": "https://www.diretta.it/serie-a/classifiche/#/UcnjEEGS/table/overall",
+    "nextMatchDayUrl": "https://www.diretta.it/serie-a/calendario",
+    "numberOfTeams": 20
+  },
+  {
+    "countryCode": "IT",
+    "championshipName": "Serie B",
+    "rankingUrl": "https://www.diretta.it/serie-b/classifiche/#/OK73VeWd/table/overall",
+    "nextMatchDayUrl": "https://www.diretta.it/serie-b/calendario/",
+    "numberOfTeams": 20
+  },
+  {
+    "countryCode": "UK",
+    "championshipName": "Premier League",
+    "rankingUrl": "https://www.diretta.it/calcio/inghilterra/premier-league/classifiche/#/I3O5jpB2/table/overall",
+    "nextMatchDayUrl": "https://www.diretta.it/calcio/inghilterra/premier-league/calendario/",
+    "numberOfTeams": 20
+  },
+  {
+    "countryCode": "FR",
+    "championshipName": "Ligue one",
+    "rankingUrl": "https://www.diretta.it/calcio/francia/ligue-1/classifiche/#/Q1sSPOn5/table/overall",
+    "nextMatchDayUrl": "https://www.diretta.it/calcio/francia/ligue-1/calendario/",
+    "numberOfTeams": 18
+  },
+  {
+    "countryCode": "ES",
+    "championshipName": "La Liga",
+    "rankingUrl": "https://www.diretta.it/calcio/spagna/laliga/classifiche/",
+    "nextMatchDayUrl": "https://www.diretta.it/calcio/spagna/laliga/calendario/",
+    "numberOfTeams": 20
+  }
+]

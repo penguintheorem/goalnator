@@ -1,0 +1,18 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Resources:
+  goalnator:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: ./dist/index.handler # Update the path to your compiled TypeScript handler
+      Runtime: nodejs20.x
+      CodeUri: ./
+      Timeout: 300 # Maximum execution time for the function in seconds
+      MemorySize: 4096
+      Events:
+        HelloWorldApi:
+          Type: Api
+          Properties:
+            Path: /hello
+            Method: get

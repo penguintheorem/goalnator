@@ -5,3 +5,6 @@
 *.log
 
 /dist
+/build
+dev-notes.txt
+.env
