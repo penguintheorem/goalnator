@@ -1,20 +1,21 @@
 import { EmailSender } from '@lib/EmailSender'
+import { FootballPredictionsEmailTemplateBuilder } from '@lib/FootballPredictionsEmailTemplateBuilder'
 import { SimpleEmailServiceClient } from '@lib/SimpleEmailServiceClient'
 import { WebScraper } from '@lib/WebScraper'
 import { WebScraperPuppeteer } from '@lib/WebScraperPuppeteer'
 import { WebScrapingConfig } from '@lib/types/WebScrapingConfig'
 import { FootballPredictionEngine } from '@model/FootballPredictionEngine'
 import { ShortFrequencyPredictor } from '@model/ShortFrequencyPredictor'
+import { ChampionshipPredictions, ChampionshipStats } from '@model/types'
 import {
   APIGatewayEvent,
   APIGatewayProxyResult,
   Context,
   EventBridgeEvent,
 } from 'aws-lambda'
-import configs from './config/web-scraping-config.json'
-import { ChampionshipPredictions, ChampionshipStats } from '@model/types'
-import { FootballPredictionsEmailTemplateBuilder } from '@lib/FootballPredictionsEmailTemplateBuilder'
 import dotenv from 'dotenv'
+import configs from './config/web-scraping-config.json'
+import { formatDate } from './utils/formatDate'
 
 dotenv.config()
 
@@ -30,6 +31,7 @@ const getStats = async (
     // TODO: replace with a good logger
     const { championshipName } = championshipConfig
     console.log(`START Getting stats for championship ${championshipName}`)
+
     const ranking = await webScraper.getRanking(championshipConfig.rankingUrl)
     const matchDay = await webScraper.getMatchDay(
       championshipConfig.nextMatchDayUrl,
@@ -74,7 +76,11 @@ const sendEmail = (
   )
 
   const targetEmails = JSON.parse(process.env.TARGET_EMAILS_JSON)
-  return emailSender.sendEmail(targetEmails, emailContent, 'Weekly Predictions')
+  return emailSender.sendEmail(
+    targetEmails,
+    emailContent,
+    `Goalnator Weekly predictions - ${formatDate(new Date())}`,
+  )
 }
 
 // TODO: configure a custom logger here

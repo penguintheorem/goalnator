@@ -2,6 +2,7 @@ import { EmailTemplateBuilder } from './EmailTemplateBuilder'
 import { ChampionshipPredictions } from '@model/types'
 import Handlebars from 'handlebars'
 import { readFileSync } from 'node:fs'
+import { formatDate } from 'src/utils/formatDate'
 
 const LAMBDA_TASK_ROOT = process.env.LAMBDA_TASK_ROOT || '/var/task'
 const BASIC_PREDICTION_TEMPLATE =
@@ -19,7 +20,7 @@ export class FootballPredictionsEmailTemplateBuilder
       championshipPredictions: ChampionshipPredictions[]
     }>(templateFile)
     const emailContent = template({
-      title: `Weekly predictions ${new Date().toLocaleDateString()}`,
+      title: `Weekly predictions ${formatDate(new Date())}`,
       championshipPredictions: content,
     })
 

@@ -1,12 +1,10 @@
-import { Ranking, MatchDay, MatchResult } from '@model/types'
-import { WebScraper } from './WebScraper'
-import puppeteer, { Browser, Page } from 'puppeteer-core'
+import { MatchDay, MatchResult, Ranking } from '@model/types'
 import Chromium from '@sparticuz/chromium-min'
+import puppeteer, { Browser, Page } from 'puppeteer-core'
+import { WebScraper } from './WebScraper'
+import { waitForMs } from 'src/utils/waitForMs'
 
 // Approach seen here https://www.stefanjudis.com/blog/how-to-use-headless-chrome-in-serverless-functions/
-// Not sure if it would work also in Lambdas, maybe I can store it in my own S3 bucket
-const CDN_CHROMIUM_DOWNLOAD_URL = `https://github.com/Sparticuz/chromium/releases/download/v122.0.0/chromium-v122.0.0-pack.tar`
-
 const attachLogger = (page: Page) => {
   page.on('console', (message) => console.log('[BROWSER]:', message.text()))
 }
@@ -18,7 +16,7 @@ export class WebScraperPuppeteer implements WebScraper {
     if (!this.browser) {
       this.browser = await puppeteer.launch({
         executablePath: await Chromium.executablePath(
-          CDN_CHROMIUM_DOWNLOAD_URL,
+          process.env.CDN_CHROMIUM_DOWNLOAD_URL,
         ),
         headless: true,
         ignoreHTTPSErrors: true,
@@ -40,6 +38,7 @@ export class WebScraperPuppeteer implements WebScraper {
       timeout: 0,
     })
     await page.waitForSelector('.ui-table__row')
+    await waitForMs(5000)
 
     return page.evaluate(() => {
       // TODO: this looks quite legacy, consider refactoring
@@ -126,6 +125,7 @@ export class WebScraperPuppeteer implements WebScraper {
     const rootCalendarSelector =
       '.event__match.event__match--static.event__match--scheduled'
     await page.waitForSelector(rootCalendarSelector)
+    await waitForMs(5000)
 
     return page.evaluate(() => {
       const extractInnerHTMLSafe = (

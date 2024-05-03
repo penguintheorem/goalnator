@@ -8,5 +8,6 @@ declare namespace NodeJS {
     AWS_REGION: string
     SENDER_EMAIL: string
     TARGET_EMAILS_JSON: string
+    CDN_CHROMIUM_DOWNLOAD_URL: string
   }
 }
