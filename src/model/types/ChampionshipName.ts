@@ -1,0 +1,10 @@
+export type ChampionshipName =
+  | 'Serie A'
+  | 'Serie B'
+  | 'Premier League'
+  | 'Ligue one'
+  | 'La Liga'
+  | 'Bundesliga'
+  | 'Eredivisie'
+  | 'Czech Liga'
+  | 'Portugal Liga'

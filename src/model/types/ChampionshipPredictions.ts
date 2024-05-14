@@ -1,6 +1,7 @@
+import { ChampionshipName } from './ChampionshipName'
 import { MatchPrediction } from './MatchPrediction'
 
 export type ChampionshipPredictions = {
-  championshipName: string
+  championshipName: ChampionshipName
   predictions: MatchPrediction[]
 }

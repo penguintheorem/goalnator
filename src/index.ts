@@ -88,9 +88,8 @@ export const handler = async (
   event: EventBridgeEvent<string, any> | APIGatewayEvent,
   context: Context,
 ): Promise<APIGatewayProxyResult> => {
-  // FEATURE: add validation
-  // we may accept only the championship predictions that we are expecting
-  const webScrapingConfigs: WebScrapingConfig[] = configs
+  // FEATURE: add validation to the configs
+  const webScrapingConfigs: WebScrapingConfig[] = configs as WebScrapingConfig[]
   const stats = await getStats(webScrapingConfigs)
   const predictions = getPredictions(stats)
   const emailSendingResult = await sendEmail(predictions)

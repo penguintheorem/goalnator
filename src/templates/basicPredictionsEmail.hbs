@@ -26,6 +26,26 @@
     {{/each}}
     <br />
     <br />
+    <h1>Systems</h1>
+    {{#each systems}}
+      <table border='1' cellpadding='5' cellspacing='0'>
+        <tr>
+          <th>Match Time</th>
+          <th>Home Team</th>
+          <th>Away Team</th>
+          <th>Result</th>
+        </tr>
+        {{#each this}}
+          <tr>
+            <td>{{metadata.matchTime}}</td>
+            <td>{{metadata.homeTeam}}</td>
+            <td>{{metadata.awayTeam}}</td>
+            <td>{{result}}</td>
+          </tr>
+        {{/each}}
+      </table>
+      <br />
+    {{/each}}
     <footer>
       <p>Happy betting!</p>
     </footer>

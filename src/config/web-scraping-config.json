@@ -50,14 +50,14 @@
   },
   {
     "countryCode": "CZ",
-    "championshipName": "Czech liga",
+    "championshipName": "Czech Liga",
     "rankingUrl": "https://www.diretta.it/calcio/repubblica-ceca/1-liga/classifiche/#/KhYnATkM/table/overall",
     "nextMatchDayUrl": "https://www.diretta.it/calcio/repubblica-ceca/1-liga/calendario/",
     "numberOfTeams": 16
   },
   {
     "countryCode": "PR",
-    "championshipName": "Portugal liga",
+    "championshipName": "Portugal Liga",
     "rankingUrl": "https://www.diretta.it/calcio/portogallo/liga-portugal/classifiche",
     "nextMatchDayUrl": "https://www.diretta.it/calcio/portogallo/liga-portugal/calendario",
     "numberOfTeams": 18
